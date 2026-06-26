@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             String             @id @default(cuid())
+  email          String             @unique
+  clerkId        String             @unique
+  role           String             @default("USER") // "USER" or "ADMIN"
+  plan           String             @default("FREE")
+  credits        Int                @default(10)
+  scans          Scan[]
+  applications   Application[]
+  coverLetters   CoverLetter[]
+  interviews     Interview[]
+  roadmaps       Roadmap[]
+  savedCompanies UserSavedCompany[]
+  mentions       CompanyMention[]
+  createdAt      DateTime           @default(now())
+}
+
+model Scan {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  jobTitle        String   // Optionally extracted or inputted
+  atsScore        Int
+  missingKeywords String   // Stored as JSON string
+  weakBullets     String   // Stored as JSON string
+  suggestions     String   // Stored as JSON string
+  createdAt       DateTime @default(now())
+}
+
+model Application {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company         String
+  role            String
+  status          String   @default("WISHLIST") // WISHLIST, APPLIED, ONLINE_ASSESSMENT, INTERVIEW, OFFER, REJECTED
+  
+  jobUrl          String?
+  jobDescription  String?
+  salaryRange     String?
+  location        String?
+  jobType         String?
+  priority        String?  // HIGH, MEDIUM, LOW
+  tags            String?  // JSON string array
+  notes           String?
+  deadline        DateTime?
+  reminderDate    DateTime?
+  kanbanOrder     Int      @default(0)
+  
+  recruiterName   String?
+  recruiterEmail  String?
+  recruiterPhone  String?
+  
+  appliedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  timeline        ApplicationTimeline[]
+}
+
+model ApplicationTimeline {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  status        String
+  notes         String?
+  date          DateTime    @default(now())
+}
+
+model CoverLetter {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  jobTitle       String
+  company        String
+  content        String
+  jobDescription String?
+  createdAt      DateTime @default(now())
+}
+
+model Interview {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  jobTitle  String
+  questions String   // Stored as JSON string
+  responses String?  // Stored as JSON string
+  feedback  String?  // Stored as JSON string
+  createdAt DateTime @default(now())
+}
+
+model Roadmap {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  targetRole      String
+  missingSkills   String   // Stored as JSON string
+  recommendations String   // Stored as JSON string
+  createdAt       DateTime @default(now())
+}
+
+model Company {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  domain          String?  @unique
+  website         String?
+  logoUrl         String?
+  industry        String?
+  headquarters    String?
+  employeeCount   Int?
+  foundedYear     Int?
+  revenueRange    String?
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  insights        CompanyInsight[]
+  savedBy         UserSavedCompany[]
+  mentions        CompanyMention[]
+}
+
+model CompanyInsight {
+  id              String   @id @default(cuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  overview        String?
+  mission         String?
+  culture         String?  // Stored as JSON string array
+  benefits        String?  // Stored as JSON string array
+  
+  techStack             String?  // Stored as JSON string array of objects
+  cloudProviders        String?  // JSON string array
+  programmingLanguages  String?  // JSON string array
+  frameworks            String?  // JSON string array
+  databases             String?  // JSON string array
+  
+  linkedinUrl     String?
+  twitterUrl      String?
+  githubUrl       String?
+  glassdoorUrl    String?
+  
+  fundingRounds   String?  // JSON string
+  totalFunding    BigInt?
+  lastFundingDate DateTime?
+  
+  interviewDifficulty   String?
+  commonInterviewTopics String?  // JSON string array
+  averageSalary         Int?
+  cultureScore          Float?
+  
+  recentNews      String?  // JSON string array of objects
+  recentHires     String?  // JSON string array
+  openPositions   Int?
+  
+  source          String?
+  lastFetched     DateTime @default(now())
+  fetchStatus     String?
+  errorMessage    String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model UserSavedCompany {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, companyId])
+}
+
+model CompanyMention {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contextType String?
+  contextId   String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}

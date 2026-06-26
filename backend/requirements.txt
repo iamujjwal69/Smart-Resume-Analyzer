@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+pymupdf
+spacy
+motor
+python-dotenv
+pydantic
+google-genai

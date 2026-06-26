@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: careeros-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    # Build and start commands are handled by Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        value: "<YOUR_DATABASE_URL>"
+      - key: OPENAI_API_KEY
+        value: "<YOUR_OPENAI_API_KEY>"
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        value: "<YOUR_CLERK_PUBLISHABLE_KEY>"
+      - key: CLERK_SECRET_KEY
+        value: "<YOUR_CLERK_SECRET_KEY>"
