@@ -29,7 +29,8 @@ export default function InterviewPage() {
     formData.append("job_description", jobDescription);
 
     try {
-      const response = await fetch("http://localhost:8000/api/interview/generate", {
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://career-os-backend-28pu.onrender.com";
+      const response = await fetch(`${BACKEND_URL}/api/interview/generate`, {
         method: "POST",
         body: formData,
       });

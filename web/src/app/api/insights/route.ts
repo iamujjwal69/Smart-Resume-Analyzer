@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
       const formData = new FormData();
       formData.append("company_name", companyName);
 
-      const response = await fetch("http://localhost:8000/api/company/insights", {
+      const BACKEND_URL = process.env.BACKEND_URL || "https://career-os-backend-28pu.onrender.com";
+      const response = await fetch(`${BACKEND_URL}/api/company/insights`, {
         method: "POST",
         body: formData,
       });

@@ -28,7 +28,8 @@ export default function TailorPage() {
     formData.append("job_description", jobDescription);
 
     try {
-      const response = await fetch("http://localhost:8000/api/resume/tailor", {
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://career-os-backend-28pu.onrender.com";
+      const response = await fetch(`${BACKEND_URL}/api/resume/tailor`, {
         method: "POST",
         body: formData,
       });
