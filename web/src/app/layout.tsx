@@ -62,7 +62,7 @@ export default function RootLayout({
                     >
                       New Analysis ✨
                     </Link>
-                    <UserButton afterSignOutUrl="/sign-in" />
+                    <UserButton />
                   </div>
                 </Show>
               </div>

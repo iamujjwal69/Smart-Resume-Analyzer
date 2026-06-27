@@ -115,7 +115,7 @@ export function ApplicationModal({ isOpen, onClose, application, onSave }: Appli
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(v) => handleSelectChange("status", v)}>
+              <Select value={formData.status} onValueChange={(v) => handleSelectChange("status", v as string)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -131,7 +131,7 @@ export function ApplicationModal({ isOpen, onClose, application, onSave }: Appli
             </div>
             <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select value={formData.priority} onValueChange={(v) => handleSelectChange("priority", v)}>
+              <Select value={formData.priority} onValueChange={(v) => handleSelectChange("priority", v as string)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
