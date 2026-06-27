@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     const isStale = company && company.updatedAt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     if (company && company.insights.length > 0 && !isStale) {
+      const { id: _insightId, companyId: _companyId, ...insightData } = company.insights[0];
       return NextResponse.json({
         status: "completed",
         data: {
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
           headquarters: company.headquarters,
           employeeCount: company.employeeCount,
           foundedYear: company.foundedYear,
-          ...company.insights[0] // Spread insight properties
+          ...insightData
         },
         cached: true,
       });
@@ -93,6 +94,8 @@ export async function POST(req: Request) {
       }
     });
 
+    const { id: _insightId, companyId: _companyId, ...insightData } = insight;
+
     return NextResponse.json({
       status: "completed",
       data: {
@@ -102,7 +105,7 @@ export async function POST(req: Request) {
         headquarters: company.headquarters,
         employeeCount: company.employeeCount,
         foundedYear: company.foundedYear,
-        ...insight
+        ...insightData
       },
       cached: false,
     });
