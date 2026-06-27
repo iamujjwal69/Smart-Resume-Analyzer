@@ -4,9 +4,10 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,7 +25,7 @@ export async function PUT(
 
     // Verify ownership
     const application = await prisma.application.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!application || application.userId !== dbUser.id) {
@@ -32,7 +33,7 @@ export async function PUT(
     }
 
     const updatedApp = await prisma.application.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         company: body.company,
         role: body.role,
@@ -55,9 +56,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -72,7 +74,7 @@ export async function DELETE(
     }
 
     const application = await prisma.application.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!application || application.userId !== dbUser.id) {
@@ -80,7 +82,7 @@ export async function DELETE(
     }
 
     await prisma.application.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

@@ -4,9 +4,10 @@ import prisma from "@/lib/prisma";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,7 +25,7 @@ export async function PATCH(
 
     // Verify ownership
     const application = await prisma.application.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!application || application.userId !== dbUser.id) {
@@ -36,7 +37,7 @@ export async function PATCH(
     if (kanbanOrder !== undefined) updateData.kanbanOrder = kanbanOrder;
 
     const updatedApp = await prisma.application.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
     });
 
@@ -44,7 +45,7 @@ export async function PATCH(
     if (status && status !== application.status) {
       await prisma.applicationTimeline.create({
         data: {
-          applicationId: params.id,
+          applicationId: id,
           status,
           notes: `Moved to ${status}`,
         },

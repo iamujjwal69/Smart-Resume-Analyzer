@@ -4,9 +4,10 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await auth();
 
     if (!userId) {
@@ -26,7 +27,7 @@ export async function PUT(
 
     const coverLetter = await prisma.coverLetter.update({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
       data: {
@@ -43,9 +44,10 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await auth();
 
     if (!userId) {
@@ -62,7 +64,7 @@ export async function DELETE(
 
     const coverLetter = await prisma.coverLetter.delete({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     });
