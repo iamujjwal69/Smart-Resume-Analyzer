@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const { data } = await response.json();
 
     // 3. Save to Database
-    company = await prisma.company.upsert({
+    const updatedCompany = await prisma.company.upsert({
       where: { name: companyName },
       update: {
         domain: data.domain,
@@ -74,12 +74,12 @@ export async function POST(req: Request) {
 
     // Delete old insights if any to replace with fresh ones
     await prisma.companyInsight.deleteMany({
-      where: { companyId: company.id }
+      where: { companyId: updatedCompany.id }
     });
 
     const insight = await prisma.companyInsight.create({
       data: {
-        companyId: company.id,
+        companyId: updatedCompany.id,
         overview: data.overview,
         culture: JSON.stringify(data.culture || []),
         benefits: JSON.stringify(data.benefits || []),
@@ -99,12 +99,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       status: "completed",
       data: {
-        id: company.id,
-        name: company.name,
-        industry: company.industry,
-        headquarters: company.headquarters,
-        employeeCount: company.employeeCount,
-        foundedYear: company.foundedYear,
+        id: updatedCompany.id,
+        name: updatedCompany.name,
+        industry: updatedCompany.industry,
+        headquarters: updatedCompany.headquarters,
+        employeeCount: updatedCompany.employeeCount,
+        foundedYear: updatedCompany.foundedYear,
         ...insightData
       },
       cached: false,
