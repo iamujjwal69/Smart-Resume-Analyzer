@@ -210,14 +210,20 @@ export default function CompanyInsightsPage() {
               <CardContent>
                 <div className="space-y-4">
                   {safeParseJSON(insights.recentNews).map((newsItem: string, i: number) => (
-                    <div key={i} className="group cursor-pointer">
+                    <a 
+                      key={i} 
+                      href={`https://www.google.com/search?q=${encodeURIComponent(newsItem + " " + insights.name + " news")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group block cursor-pointer"
+                    >
                       <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2">
                         {newsItem}
                       </p>
-                      <div className="flex items-center text-xs text-muted-foreground mt-1">
+                      <div className="flex items-center text-xs text-primary mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
                         Read more <ArrowUpRight className="h-3 w-3 ml-1" />
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </CardContent>
