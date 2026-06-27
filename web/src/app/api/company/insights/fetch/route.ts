@@ -35,13 +35,13 @@ export async function POST(req: Request) {
     }
 
     // 2. Fetch from Python Backend (which uses Gemini as the primary enricher)
-    const formData = new FormData();
-    formData.append("company_name", companyName);
+    const params = new URLSearchParams();
+    params.append("company_name", companyName);
 
     const BACKEND_URL = process.env.BACKEND_URL || "https://career-os-backend-28pu.onrender.com";
     const response = await fetch(`${BACKEND_URL}/api/company/insights`, {
       method: "POST",
-      body: formData,
+      body: params,
     });
 
     if (!response.ok) {
