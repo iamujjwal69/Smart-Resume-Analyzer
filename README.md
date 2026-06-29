@@ -1,5 +1,6 @@
 # Smart Resume Analyzer (CareerOS)
 
+**🚀 Live Demo:** [https://mycareer-os69.vercel.app/](https://mycareer-os69.vercel.app/)
 ## 📖 Project Overview
 **Smart Resume Analyzer**, also branded as **CareerOS**, is a modern, AI‑powered web application that helps job seekers **craft, evaluate, and improve their resumes, cover letters, and interview preparation**. It combines a sleek, glassmorphic UI with powerful backend services (OpenAI, Clerk authentication, Prisma, and custom NLP pipelines) to deliver instant, data‑driven feedback.
 
