@@ -119,66 +119,86 @@ export async function POST(req: Request) {
       };
     }
 
-    // 3. Save to Database
-    const updatedCompany = await prisma.company.upsert({
-      where: { name: companyName },
-      update: {
-        domain: data.domain,
-        industry: data.industry,
-        headquarters: data.headquarters,
-        employeeCount: data.employeeCount,
-        foundedYear: data.foundedYear,
-        description: data.overview,
-      },
-      create: {
-        name: companyName,
-        domain: data.domain,
-        industry: data.industry,
-        headquarters: data.headquarters,
-        employeeCount: data.employeeCount,
-        foundedYear: data.foundedYear,
-        description: data.overview,
-      },
-    });
+    // 3. Save to Database (Resilient)
+    let updatedCompany: any = null;
+    let insightData: any = {};
 
-    // Delete old insights if any to replace with fresh ones
-    await prisma.companyInsight.deleteMany({
-      where: { companyId: updatedCompany.id }
-    });
+    try {
+      updatedCompany = await prisma.company.upsert({
+        where: { name: companyName },
+        update: {
+          industry: data.industry,
+          headquarters: data.headquarters,
+          employeeCount: data.employeeCount,
+          foundedYear: data.foundedYear,
+          description: data.overview,
+        },
+        create: {
+          name: companyName,
+          domain: `${cleanName.toLowerCase().replace(/[^a-z0-9]/g, "")}-${Date.now().toString(36)}.com`,
+          industry: data.industry,
+          headquarters: data.headquarters,
+          employeeCount: data.employeeCount,
+          foundedYear: data.foundedYear,
+          description: data.overview,
+        },
+      });
 
-    const insight = await prisma.companyInsight.create({
-      data: {
-        companyId: updatedCompany.id,
+      // Delete old insights if any to replace with fresh ones
+      await prisma.companyInsight.deleteMany({
+        where: { companyId: updatedCompany.id },
+      });
+
+      const insight = await prisma.companyInsight.create({
+        data: {
+          companyId: updatedCompany.id,
+          overview: data.overview,
+          culture: JSON.stringify(data.culture || []),
+          benefits: JSON.stringify(data.benefits || []),
+          techStack: JSON.stringify(data.techStack || []),
+          interviewDifficulty: data.interviewDifficulty || "Medium",
+          commonInterviewTopics: JSON.stringify(data.commonInterviewTopics || []),
+          averageSalary: data.averageSalary,
+          cultureScore: data.cultureScore,
+          recentNews: JSON.stringify(data.news || []),
+          fetchStatus: "completed",
+          source: "gemini",
+        },
+      });
+
+      const { id: _insightId, companyId: _companyId, ...restInsight } = insight;
+      insightData = restInsight;
+    } catch (dbErr) {
+      console.warn("Could not cache company insight to database, returning direct data:", dbErr);
+      insightData = {
         overview: data.overview,
         culture: JSON.stringify(data.culture || []),
         benefits: JSON.stringify(data.benefits || []),
         techStack: JSON.stringify(data.techStack || []),
-        interviewDifficulty: data.interviewDifficulty,
+        interviewDifficulty: data.interviewDifficulty || "Medium",
         commonInterviewTopics: JSON.stringify(data.commonInterviewTopics || []),
         averageSalary: data.averageSalary,
         cultureScore: data.cultureScore,
         recentNews: JSON.stringify(data.news || []),
         fetchStatus: "completed",
-        source: "gemini"
-      }
-    });
-
-    const { id: _insightId, companyId: _companyId, ...insightData } = insight;
+        source: "gemini",
+      };
+    }
 
     return NextResponse.json({
       status: "completed",
       data: {
-        id: updatedCompany.id,
-        name: updatedCompany.name,
-        industry: updatedCompany.industry,
-        headquarters: updatedCompany.headquarters,
-        employeeCount: updatedCompany.employeeCount,
-        foundedYear: updatedCompany.foundedYear,
-        ...insightData
+        id: updatedCompany?.id || "temp-id",
+        name: companyName,
+        industry: data.industry,
+        headquarters: data.headquarters,
+        employeeCount: data.employeeCount,
+        foundedYear: data.foundedYear,
+        description: data.overview,
+        ...insightData,
       },
       cached: false,
     });
-
   } catch (error) {
     console.error("Error fetching company insights:", error);
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
