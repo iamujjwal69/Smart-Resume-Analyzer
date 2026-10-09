@@ -50,8 +50,7 @@ export default function UploadPage() {
       
       setProgress(40);
       
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://career-os-backend-28pu.onrender.com";
-      const response = await fetch(`${BACKEND_URL}/api/analyze`, {
+      const response = await fetch("/api/backend/analyze", {
         method: "POST",
         body: formData,
       });

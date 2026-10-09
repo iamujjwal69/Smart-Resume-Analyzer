@@ -21,8 +21,7 @@ export default function RoadmapPage() {
     formData.append("target_role", targetRole);
 
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://career-os-backend-28pu.onrender.com";
-      const response = await fetch(`${BACKEND_URL}/api/roadmap/generate`, {
+      const response = await fetch("/api/backend/roadmap/generate", {
         method: "POST",
         body: formData,
       });

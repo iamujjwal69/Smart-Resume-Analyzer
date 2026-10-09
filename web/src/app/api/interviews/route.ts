@@ -36,12 +36,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const dbUser = await prisma.user.findUnique({
+    let dbUser = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
     if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      dbUser = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: "user@example.com",
+        },
+      });
     }
 
     const body = await req.json();

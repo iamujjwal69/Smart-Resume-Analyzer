@@ -45,8 +45,7 @@ export default function CoverLetterPage() {
       formDataToSend.append("role", data.role);
       formDataToSend.append("job_description", data.jobDescription || "");
 
-      // Call Python backend
-      const response = await fetch("http://127.0.0.1:8000/api/cover-letter", {
+      const response = await fetch("/api/backend/cover-letter", {
         method: "POST",
         body: formDataToSend,
       });

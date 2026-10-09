@@ -10,12 +10,12 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
     if (!user) {
-      return new NextResponse("User not found in DB", { status: 404 });
+      return NextResponse.json([]);
     }
 
     const coverLetters = await prisma.coverLetter.findMany({
@@ -38,12 +38,17 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
     if (!user) {
-      return new NextResponse("User not found in DB", { status: 404 });
+      user = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: "user@example.com",
+        },
+      });
     }
 
     const body = await req.json();
